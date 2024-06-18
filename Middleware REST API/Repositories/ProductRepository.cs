@@ -2,6 +2,7 @@
 using Microsoft.Identity.Client;
 using Middleware_REST_API.Model;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Middleware_REST_API.Repositories
 {
@@ -51,11 +52,13 @@ namespace Middleware_REST_API.Repositories
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
-            var products = JsonConvert.DeserializeObject<IEnumerable<Product>>(json);
+            var jsonObject = JObject.Parse(json);
+            var productsJson = jsonObject["products"].ToString();
 
 
-            return products;
+            return JsonConvert.DeserializeObject<IEnumerable<Product>>(productsJson);
         }
+
 
         public async Task<Product> GetProductByIdFromExternalApi(int id)
         {
@@ -73,35 +76,42 @@ namespace Middleware_REST_API.Repositories
 
         public async Task<IEnumerable<Product>> GetProductsByCategoryFromExternalApi(string category)
         {
-            var response = await _httpClient.GetAsync($"https://dummyjson.com/products?category={category}");
+            var response = await _httpClient.GetAsync($"https://dummyjson.com/products/category/{category}");
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
-            var products = JsonConvert.DeserializeObject<IEnumerable<Product>>(json);
+            var jsonObject = JObject.Parse(json);
+            var productsJson = jsonObject["products"].ToString();
 
-            return products;
+            return JsonConvert.DeserializeObject<IEnumerable<Product>>(productsJson);
         }
 
         public async Task<IEnumerable<Product>> GetProductsByPriceRangeFromExternalApi(decimal minPrice, decimal maxPrice)
         {
-            var response = await _httpClient.GetAsync($"https://dummyjson.com/products?minPrice={minPrice}&maxPrice={maxPrice}");
+            var response = await _httpClient.GetAsync($"https://dummyjson.com/products");
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
-            var products = JsonConvert.DeserializeObject<IEnumerable<Product>>(json);
+            var jsonObject = JObject.Parse(json);
+            var productsJson = jsonObject["products"].ToString();
+            var products = JsonConvert.DeserializeObject<IEnumerable<Product>>(productsJson);
 
-            return products;
+            var filteredProducts = products.Where(p => p.Price >= minPrice && p.Price <= maxPrice);
+
+
+            return filteredProducts;
         }
 
         public async Task<IEnumerable<Product>> SearchProductsByNameFromExternalApi(string name)
         {
-            var response = await _httpClient.GetAsync($"https://dummyjson.com/products?name={name}");
+            var response = await _httpClient.GetAsync($"https://dummyjson.com/products/search?q={name}");
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
-            var products = JsonConvert.DeserializeObject<IEnumerable<Product>>(json);
+            var jsonObject = JObject.Parse(json);
+            var productsJson = jsonObject["products"].ToString();
 
-            return products;
+            return JsonConvert.DeserializeObject<IEnumerable<Product>>(productsJson);
         }
     }
 }
