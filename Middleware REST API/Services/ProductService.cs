@@ -1,5 +1,7 @@
-﻿using Middleware_REST_API.Model;
+﻿using Microsoft.Identity.Client;
+using Middleware_REST_API.Model;
 using Middleware_REST_API.Repositories;
+using Newtonsoft.Json;
 
 namespace Middleware_REST_API.Services
 {
@@ -11,6 +13,10 @@ namespace Middleware_REST_API.Services
         { 
             _productRepository = productRepository;
         }
+
+
+
+        // Methods for possible future database operations
 
         public async Task<IEnumerable<Product>> GetAllProducts()
         {
@@ -35,6 +41,36 @@ namespace Middleware_REST_API.Services
         public async Task<IEnumerable<Product>> SearchProductsByName(string name)
         {
             return await _productRepository.SearchProductsByName(name);
+        }
+
+
+
+
+        // Methods for API operations
+
+        public async Task<IEnumerable<Product>> GetAllProductsFromExternalApi()
+        {
+            return await _productRepository.GetAllProductsFromExternalApi();
+        }
+
+        public async Task<Product> GetProductByIdFromExternalApi(int id)
+        {
+            return await _productRepository.GetProductByIdFromExternalApi(id);
+        }
+
+        public async Task<IEnumerable<Product>> GetProductsByCategoryFromExternalApi(string category)
+        {
+            return await _productRepository.GetProductsByCategoryFromExternalApi(category);
+        }
+
+        public async Task<IEnumerable<Product>> GetProductsByPriceRangeFromExternalApi(decimal minPrice, decimal maxPrice)
+        {
+            return await _productRepository.GetProductsByPriceRangeFromExternalApi(minPrice, maxPrice);
+        }
+
+        public async Task<IEnumerable<Product>> SearchProductsByNameFromExternalApi(string name)
+        {
+            return await _productRepository.SearchProductsByNameFromExternalApi(name);
         }
     }
 }

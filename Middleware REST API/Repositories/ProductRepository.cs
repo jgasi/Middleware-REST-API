@@ -1,17 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using Middleware_REST_API.Model;
+using Newtonsoft.Json;
 
 namespace Middleware_REST_API.Repositories
 {
     public class ProductRepository : IProductRepository
     {
         private readonly ContextDb _context;
+        private readonly HttpClient _httpClient;
 
-        public ProductRepository(ContextDb context) 
+        public ProductRepository(ContextDb context, HttpClient httpClient) 
         {
             _context = context;
+            _httpClient = httpClient;
         }
 
+        // Methods for possible future database operations
         public async Task<IEnumerable<Product>> GetAllProducts()
         {
             return await _context.Products.ToListAsync();
@@ -35,6 +40,68 @@ namespace Middleware_REST_API.Repositories
         public async Task<IEnumerable<Product>> SearchProductsByName(string name)
         {
             return await _context.Products.Where(p => p.Name.Contains(name)).ToListAsync();
+        }
+
+
+
+        // Methods for API operations
+        public async Task<IEnumerable<Product>> GetAllProductsFromExternalApi()
+        {
+            var response = await _httpClient.GetAsync("https://dummyjson.com/products");
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var products = JsonConvert.DeserializeObject<IEnumerable<Product>>(json);
+
+
+            return products;
+        }
+
+        public async Task<Product> GetProductByIdFromExternalApi(int id)
+        {
+            var response = await _httpClient.GetAsync($"https://dummyjson.com/products/{id}");
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception($"Product with ID {id} not found.");
+            }
+
+            var json = await response.Content.ReadAsStringAsync();
+            var product = JsonConvert.DeserializeObject<Product>(json);
+
+            return product;
+        }
+
+        public async Task<IEnumerable<Product>> GetProductsByCategoryFromExternalApi(string category)
+        {
+            var response = await _httpClient.GetAsync($"https://dummyjson.com/products?category={category}");
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var products = JsonConvert.DeserializeObject<IEnumerable<Product>>(json);
+
+            return products;
+        }
+
+        public async Task<IEnumerable<Product>> GetProductsByPriceRangeFromExternalApi(decimal minPrice, decimal maxPrice)
+        {
+            var response = await _httpClient.GetAsync($"https://dummyjson.com/products?minPrice={minPrice}&maxPrice={maxPrice}");
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var products = JsonConvert.DeserializeObject<IEnumerable<Product>>(json);
+
+            return products;
+        }
+
+        public async Task<IEnumerable<Product>> SearchProductsByNameFromExternalApi(string name)
+        {
+            var response = await _httpClient.GetAsync($"https://dummyjson.com/products?name={name}");
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var products = JsonConvert.DeserializeObject<IEnumerable<Product>>(json);
+
+            return products;
         }
     }
 }
