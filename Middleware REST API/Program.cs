@@ -5,10 +5,12 @@ using Middleware_REST_API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
+// Add services to the container.
 var services = builder.Services;
 
+// memory cache and controllers
+services.AddMemoryCache();
 builder.Services.AddControllers();
 
 // Add the database context
