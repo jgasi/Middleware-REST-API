@@ -15,37 +15,6 @@ namespace Middleware_REST_API.Services
         }
 
 
-
-        // Methods for possible future database operations
-
-        public async Task<IEnumerable<Product>> GetAllProducts()
-        {
-            return await _productRepository.GetAllProducts();
-        }
-
-        public async Task<Product> GetProductById(int id)
-        {
-            return await _productRepository.GetProductById(id);
-        }
-
-        public async Task<IEnumerable<Product>> GetProductsByCategory(string category)
-        {
-            return await _productRepository.GetProductsByCategory(category);
-        }
-
-        public async Task<IEnumerable<Product>> GetProductsByPriceRange(decimal minPrice, decimal maxPrice)
-        {
-            return await _productRepository.GetProductsByPriceRange(minPrice, maxPrice);
-        }
-
-        public async Task<IEnumerable<Product>> SearchProductsByName(string name)
-        {
-            return await _productRepository.SearchProductsByName(name);
-        }
-
-
-
-
         // Methods for API operations
 
         public async Task<IEnumerable<Product>> GetAllProductsFromExternalApi()
@@ -56,6 +25,11 @@ namespace Middleware_REST_API.Services
         public async Task<Product> GetProductByIdFromExternalApi(int id)
         {
             return await _productRepository.GetProductByIdFromExternalApi(id);
+        }
+
+        public async Task<IEnumerable<Product>> GetProductsByCategoryAndPriceRangeFromExternalApi(string category, decimal minPrice, decimal maxPrice)
+        {
+            return await _productRepository.GetProductsByCategoryAndPriceRangeFromExternalApi(category, minPrice, maxPrice);
         }
 
         public async Task<IEnumerable<Product>> GetProductsByCategoryFromExternalApi(string category)
@@ -71,6 +45,39 @@ namespace Middleware_REST_API.Services
         public async Task<IEnumerable<Product>> SearchProductsByNameFromExternalApi(string name)
         {
             return await _productRepository.SearchProductsByNameFromExternalApi(name);
+        }
+
+
+        // Methods for possible future database operations
+
+        public async Task<IEnumerable<Product>> GetAllProducts()
+        {
+            return await _productRepository.GetAllProducts();
+        }
+
+        public async Task<Product> GetProductById(int id)
+        {
+            return await _productRepository.GetProductById(id);
+        }
+
+        public async Task<IEnumerable<Product>> GetProductsByCategoryAndPriceRange(string category, decimal minPrice, decimal maxPrice)
+        {
+            return await _productRepository.GetProductsByCategoryAndPriceRange(category, minPrice, maxPrice);
+        }
+
+        public async Task<IEnumerable<Product>> GetProductsByCategory(string category)
+        {
+            return await _productRepository.GetProductsByCategory(category);
+        }
+
+        public async Task<IEnumerable<Product>> GetProductsByPriceRange(decimal minPrice, decimal maxPrice)
+        {
+            return await _productRepository.GetProductsByPriceRange(minPrice, maxPrice);
+        }
+
+        public async Task<IEnumerable<Product>> SearchProductsByName(string name)
+        {
+            return await _productRepository.SearchProductsByName(name);
         }
     }
 }

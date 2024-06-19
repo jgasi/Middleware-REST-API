@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Middleware_REST_API.Exceptions;
 using Middleware_REST_API.Model;
 using Middleware_REST_API.Services;
 
 namespace Middleware_REST_API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class ProductsController : ControllerBase
     {
@@ -14,6 +15,60 @@ namespace Middleware_REST_API.Controllers
         {
             _productService = productService;
         }
+
+
+        // Methods for API operations
+
+        [HttpGet("api")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetAllProductsFromExternalApi()
+        {
+            var products = await _productService.GetAllProductsFromExternalApi();
+            return Ok(products);
+        }
+
+        [HttpGet("api/{id}")]
+        public async Task<ActionResult<Product>> GetProductByIdFromExternalApi(int id)
+        {
+            try
+            {
+                var product = await _productService.GetProductByIdFromExternalApi(id);
+                return Ok(product);
+            }
+            catch (ProductNotFoundException ex) 
+            {
+                return NotFound(ex.Message);
+            }
+            
+        }
+
+        [HttpGet("api/category/{category}/price")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByCategoryAndPriceRangeFromExternalApi(string category, [FromQuery] decimal minPrice, [FromQuery] decimal maxPrice)
+        {
+            var products = await _productService.GetProductsByCategoryAndPriceRangeFromExternalApi(category, minPrice, maxPrice);
+            return Ok(products);
+        }
+
+        [HttpGet("api/category/{category}")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByCategoryFromExternalApi(string category)
+        {
+            var products = await _productService.GetProductsByCategoryFromExternalApi(category);
+            return Ok(products);
+        }
+
+        [HttpGet("api/price")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByPriceRangeFromExternalApi([FromQuery] decimal minPrice, [FromQuery] decimal maxPrice)
+        {
+            var products = await _productService.GetProductsByPriceRangeFromExternalApi(minPrice, maxPrice);
+            return Ok(products);
+        }
+
+        [HttpGet("api/search")]
+        public async Task<ActionResult<IEnumerable<Product>>> SearchProductsByNameFromExternalApi([FromQuery] string name)
+        {
+            var products = await _productService.SearchProductsByNameFromExternalApi(name);
+            return Ok(products);
+        }
+
 
 
         // Methods for possible future database operations
@@ -28,15 +83,23 @@ namespace Middleware_REST_API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProductById(int id)
         {
-            var product = await _productService.GetProductById(id);
-            if (product == null)
+            try
             {
-                return NotFound();
-            }
-            else
-            {
+                var product = await _productService.GetProductById(id);
                 return Ok(product);
             }
+            catch (ProductNotFoundException ex) 
+            {
+                return NotFound(ex.Message);
+            }
+            
+        }
+
+        [HttpGet("category/{category}/price")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByCategoryAndPriceRange(string category, [FromQuery] decimal minPrice, [FromQuery] decimal maxPrice)
+        {
+            var products = await _productService.GetProductsByCategoryAndPriceRange(category, minPrice, maxPrice);
+            return Ok(products);
         }
 
         [HttpGet("category/{category}")]
@@ -57,53 +120,6 @@ namespace Middleware_REST_API.Controllers
         public async Task<ActionResult<IEnumerable<Product>>> SearchProductsByName([FromQuery] string name)
         {
             var products = await _productService.SearchProductsByName(name);
-            return Ok(products);
-        }
-
-
-
-
-        // Methods for API operations
-
-        [HttpGet("external")]
-        public async Task<ActionResult<IEnumerable<Product>>> GetAllProductsFromExternalApi()
-        {
-            var products = await _productService.GetAllProductsFromExternalApi();
-            return Ok(products);
-        }
-
-        [HttpGet("external/{id}")]
-        public async Task<ActionResult<Product>> GetProductByIdFromExternalApi(int id)
-        {
-            var product = await _productService.GetProductByIdFromExternalApi(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                return Ok(product);
-            }
-        }
-
-        [HttpGet("external/category/{category}")]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByCategoryFromExternalApi(string category)
-        {
-            var products = await _productService.GetProductsByCategoryFromExternalApi(category);
-            return Ok(products);
-        }
-
-        [HttpGet("external/price")]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByPriceRangeFromExternalApi([FromQuery] decimal minPrice, [FromQuery] decimal maxPrice)
-        {
-            var products = await _productService.GetProductsByPriceRangeFromExternalApi(minPrice, maxPrice);
-            return Ok(products);
-        }
-
-        [HttpGet("external/search")]
-        public async Task<ActionResult<IEnumerable<Product>>> SearchProductsByNameFromExternalApi([FromQuery] string name)
-        {
-            var products = await _productService.SearchProductsByNameFromExternalApi(name);
             return Ok(products);
         }
     }

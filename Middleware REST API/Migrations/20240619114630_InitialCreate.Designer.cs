@@ -11,7 +11,7 @@ using Middleware_REST_API.Model;
 namespace Middleware_REST_API.Migrations
 {
     [DbContext(typeof(ContextDb))]
-    [Migration("20240618112437_InitialCreate")]
+    [Migration("20240619114630_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -40,16 +40,16 @@ namespace Middleware_REST_API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
+                    b.Property<string>("Images")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
