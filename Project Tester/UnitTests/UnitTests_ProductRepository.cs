@@ -14,6 +14,7 @@ using Moq.Protected;
 
 namespace Project_Tester.UnitTests
 {
+    [TestFixture]
     public class UnitTests_ProductRepository
     {
 
