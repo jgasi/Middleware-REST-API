@@ -56,7 +56,7 @@ namespace Middleware_REST_API.Services
                     _cache.Set(cacheKey, product, cacheEntryOptions);
                 }
             }
-            
+
 
             return product;
         }
