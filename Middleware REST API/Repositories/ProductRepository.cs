@@ -72,7 +72,7 @@ namespace Middleware_REST_API.Repositories
             var productsJson = jsonObject["products"].ToString();
             var products = JsonConvert.DeserializeObject<IEnumerable<Product>>(productsJson);
 
-            var filteredProducts = products.Where(p => p.Price >= minPrice && p.Price <= maxPrice);
+            var filteredProducts = products.Where(p => p.Category == category && p.Price >= minPrice && p.Price <= maxPrice);
 
             foreach (var product in filteredProducts)
             {
@@ -104,8 +104,10 @@ namespace Middleware_REST_API.Repositories
                     product.Description = product.Description.Substring(0, 100);
                 }
             }
+            var filteredProducts = products.Where(p => p.Category == category);
 
-            return products;
+
+            return filteredProducts;
         }
 
         public async Task<IEnumerable<Product>> GetProductsByPriceRangeFromExternalApi(decimal minPrice, decimal maxPrice)
@@ -149,8 +151,10 @@ namespace Middleware_REST_API.Repositories
                     product.Description = product.Description.Substring(0, 100);
                 }
             }
+            var filteredProducts = products.Where(p => p.Title.Contains(name, StringComparison.OrdinalIgnoreCase));
 
-            return products;
+
+            return filteredProducts;
         }
 
 
