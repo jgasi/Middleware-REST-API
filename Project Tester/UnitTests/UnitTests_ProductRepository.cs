@@ -11,12 +11,16 @@ using Middleware_REST_API.Model;
 using Middleware_REST_API.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Moq.Protected;
+using Microsoft.Extensions.Logging;
+using Middleware_REST_API.Services;
 
 namespace Project_Tester.UnitTests
 {
     [TestFixture]
     public class UnitTests_ProductRepository
     {
+        private readonly ILogger<ProductService> _logger;
+
 
         [Test]
         public async Task GetAllProductsFromExternalApi_ReturnsProducts()
@@ -43,7 +47,7 @@ namespace Project_Tester.UnitTests
             // Setup HttpClient with the mock message handler
             var httpClient = new HttpClient(mockHttpMessageHandler.Object);
 
-            var productRepository = new ProductRepository(null, httpClient);
+            var productRepository = new ProductRepository(null, httpClient, _logger);
 
             // Act
             var result = await productRepository.GetAllProductsFromExternalApi();
@@ -98,7 +102,7 @@ namespace Project_Tester.UnitTests
             // Setup HttpClient with the mock message handler
             var httpClient = new HttpClient(mockHttpMessageHandler.Object);
 
-            var productRepository = new ProductRepository(null, httpClient);
+            var productRepository = new ProductRepository(null, httpClient, _logger);
 
             // Act
             var result = await productRepository.GetProductByIdFromExternalApi(productId);
@@ -150,7 +154,7 @@ namespace Project_Tester.UnitTests
             // Setup HttpClient with the mock message handler
             var httpClient = new HttpClient(mockHttpMessageHandler.Object);
 
-            var productRepository = new ProductRepository(null, httpClient);
+            var productRepository = new ProductRepository(null, httpClient, _logger);
 
             // Act
             var result = await productRepository.GetProductsByCategoryAndPriceRangeFromExternalApi(category, minPrice, maxPrice);
@@ -207,7 +211,7 @@ namespace Project_Tester.UnitTests
             // Setup HttpClient with the mock message handler
             var httpClient = new HttpClient(mockHttpMessageHandler.Object);
 
-            var productRepository = new ProductRepository(null, httpClient);
+            var productRepository = new ProductRepository(null, httpClient, _logger);
 
             // Act
             var result = await productRepository.GetProductsByCategoryFromExternalApi(category);
@@ -264,7 +268,7 @@ namespace Project_Tester.UnitTests
             // Setup HttpClient with the mock message handler
             var httpClient = new HttpClient(mockHttpMessageHandler.Object);
 
-            var productRepository = new ProductRepository(null, httpClient);
+            var productRepository = new ProductRepository(null, httpClient, _logger);
 
             // Act
             var result = await productRepository.GetProductsByPriceRangeFromExternalApi(minPrice, maxPrice);
@@ -321,7 +325,7 @@ namespace Project_Tester.UnitTests
             // Setup HttpClient with the mock message handler
             var httpClient = new HttpClient(mockHttpMessageHandler.Object);
 
-            var productRepository = new ProductRepository(null, httpClient);
+            var productRepository = new ProductRepository(null, httpClient, _logger);
 
             // Act
             var result = await productRepository.SearchProductsByNameFromExternalApi(searchQuery);

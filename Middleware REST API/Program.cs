@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Middleware_REST_API.Model;
 using Middleware_REST_API.Repositories;
 using Middleware_REST_API.Services;
@@ -8,6 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var services = builder.Services;
+
+// Configure logging
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 // memory cache and controllers
 services.AddMemoryCache();

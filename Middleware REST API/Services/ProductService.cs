@@ -1,6 +1,9 @@
 ﻿using System.Reflection.Metadata.Ecma335;
+using Azure;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Identity.Client;
+using Middleware_REST_API.Exceptions;
 using Middleware_REST_API.Model;
 using Middleware_REST_API.Repositories;
 using Newtonsoft.Json;
@@ -11,12 +14,14 @@ namespace Middleware_REST_API.Services
     {
         private readonly IProductRepository _productRepository;
         private readonly IMemoryCache _cache;
+        private readonly ILogger<ProductService> _logger;
         private readonly TimeSpan _cacheDuration = TimeSpan.FromMinutes(5);
 
-        public ProductService(IProductRepository productRepository, IMemoryCache cache) 
+        public ProductService(IProductRepository productRepository, IMemoryCache cache, ILogger<ProductService> logger) 
         { 
             _productRepository = productRepository;
             _cache = cache;
+            _logger = logger;
         }
 
 
@@ -30,10 +35,21 @@ namespace Middleware_REST_API.Services
             {
                 products = await _productRepository.GetAllProductsFromExternalApi();
 
+                if (products == null)
+                {
+                    throw new ProductNotFoundException($"No products found from external API.");
+                }
+
+                _logger.LogInformation("Cache miss for all products. Fetching data from external API.");
+
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(_cacheDuration);
 
-                _cache.Set(cacheKey, products, cacheEntryOptions);
+                _cache.Set(cacheKey, products, cacheEntryOptions); 
+            }
+            else
+            {
+                _logger.LogInformation("Cache hit for all products. Fetching data from Cache.");
             }
 
 
@@ -47,6 +63,8 @@ namespace Middleware_REST_API.Services
             if (!_cache.TryGetValue(cacheKey, out Product product))
             {
                 product = await _productRepository.GetProductByIdFromExternalApi(id);
+                _logger.LogInformation($"Cache miss for product with ID '{id}'. Fetching data from external API.");
+
 
                 if (product != null)
                 {
@@ -55,6 +73,10 @@ namespace Middleware_REST_API.Services
 
                     _cache.Set(cacheKey, product, cacheEntryOptions);
                 }
+            }
+            else
+            {
+                _logger.LogInformation($"Cache hit for product with ID '{id}'. Fetching data from Cache.");
             }
 
 
@@ -69,10 +91,21 @@ namespace Middleware_REST_API.Services
             {
                 products = await _productRepository.GetProductsByCategoryAndPriceRangeFromExternalApi(category, minPrice, maxPrice);
 
+                if (products == null)
+                {
+                    throw new ProductNotFoundException($"No products found with Category '{category}' and price range '{minPrice}-{maxPrice}' from external API.");
+                }
+
+                _logger.LogInformation($"Cache miss for products with Category '{category}' and price range '{minPrice}-{maxPrice}'. Fetching data from external API.");
+
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(_cacheDuration);
 
                 _cache.Set(cacheKey, products, cacheEntryOptions);
+            }
+            else
+            {
+                _logger.LogInformation($"Cache hit for products with Category '{category}' and Price range '{minPrice}-{maxPrice}'. Fetching data from Cache.");
             }
 
             return products;
@@ -86,10 +119,21 @@ namespace Middleware_REST_API.Services
             {
                 products = await _productRepository.GetProductsByCategoryFromExternalApi(category);
 
+                if (products == null)
+                {
+                    throw new ProductNotFoundException($"No products found with Category '{category}' from external API.");
+                }
+
+                _logger.LogInformation($"Cache miss for products with Category '{category}'. Fetching data from external API.");
+
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(_cacheDuration);
 
                 _cache.Set(cacheKey, products, cacheEntryOptions);
+            }
+            else
+            {
+                _logger.LogInformation($"Cache hit for products with Category '{category}'. Fetching data from Cache.");
             }
 
             return products;
@@ -103,10 +147,26 @@ namespace Middleware_REST_API.Services
             {
                 products = await _productRepository.GetProductsByPriceRangeFromExternalApi(minPrice, maxPrice);
 
+                if (products == null)
+                {
+                    throw new ProductNotFoundException($"No products found with Price range '{minPrice}-{maxPrice}' from external API.");
+                }
+
+                if (products == null)
+                {
+                    return Enumerable.Empty<Product>();
+                }
+
+                _logger.LogInformation($"Cache miss for products with Price range '{minPrice}-{maxPrice}'. Fetching data from external API.");
+
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(_cacheDuration);
 
                 _cache.Set(cacheKey, products, cacheEntryOptions);
+            }
+            else
+            {
+                _logger.LogInformation($"Cache hit for products with Price range '{minPrice}-{maxPrice}'. Fetching data from Cache.");
             }
 
             return products;
@@ -120,10 +180,21 @@ namespace Middleware_REST_API.Services
             {
                 products = await _productRepository.SearchProductsByNameFromExternalApi(name);
 
+                if (products == null)
+                {
+                    throw new ProductNotFoundException($"No products containing '{name}' in Title found from external API.");
+                }
+
+                _logger.LogInformation($"Cache miss for products containing '{name}' in Title. Fetching data from external API.");
+
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(_cacheDuration);
 
                 _cache.Set(cacheKey, products, cacheEntryOptions);
+            }
+            else
+            {
+                _logger.LogInformation($"Cache hit for products containing '{name}' in Title. Fetching data from Cache.");
             }
 
 

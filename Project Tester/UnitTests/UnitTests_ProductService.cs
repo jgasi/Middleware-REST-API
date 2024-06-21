@@ -3,6 +3,8 @@ using Middleware_REST_API.Repositories;
 using Middleware_REST_API.Services;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
+using Microsoft.Extensions.Logging;
+using NUnit.Framework.Internal;
 
 namespace Project_Tester.UnitTests
 {
@@ -11,14 +13,17 @@ namespace Project_Tester.UnitTests
     {
         private Mock<IProductRepository> _mockRepository;
         private IMemoryCache _memoryCache;
-        private ProductService _productService;
+        private Mock<ILogger<ProductService>> _mockLogger;
+        private ProductService _productService;   
+
 
         [SetUp]
         public void Setup()
         {
             _mockRepository = new Mock<IProductRepository>();
             _memoryCache = new MemoryCache(new MemoryCacheOptions());
-            _productService = new ProductService(_mockRepository.Object, _memoryCache);
+            _mockLogger = new Mock<ILogger<ProductService>>();
+            _productService = new ProductService(_mockRepository.Object, _memoryCache, _mockLogger.Object);
         }
 
         [TearDown]

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Middleware_REST_API.Controllers;
 using Middleware_REST_API.Exceptions;
 using Middleware_REST_API.Model;
@@ -12,12 +13,14 @@ namespace Project_Tester.UnitTests
     {
         private Mock<IProductService> _mockProductService;
         private ProductsController _controller;
+        private readonly ILogger<ProductService> _logger;
+
 
         [SetUp]
         public void Setup()
         {
             _mockProductService = new Mock<IProductService>();
-            _controller = new ProductsController(_mockProductService.Object);
+            _controller = new ProductsController(_mockProductService.Object, _logger);
         }
 
         [Test]
