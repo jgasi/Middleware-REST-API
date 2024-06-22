@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Middleware_REST_API.Exceptions;
 using Middleware_REST_API.Model;
 using Middleware_REST_API.Services;
@@ -7,6 +8,7 @@ namespace Middleware_REST_API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize]
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
