@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Azure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using Middleware_REST_API.Exceptions;
@@ -269,7 +270,15 @@ namespace Middleware_REST_API.Repositories
         // Methods for possible future database operations
         public async Task<IEnumerable<Product>> GetAllProducts()
         {
-            return await _context.Products.ToListAsync();
+            var products = await _context.Products.ToListAsync();
+            if (!products.Any())
+            {
+
+                _logger.LogWarning($"Products not found.");
+                throw new ProductNotFoundException($"Products not found.");
+            }
+
+            return products;
         }
 
         public async Task<Product> GetProductById(int id)
@@ -277,29 +286,58 @@ namespace Middleware_REST_API.Repositories
             var product = await _context.Products.FindAsync(id);
             if (product == null)
             {
+                _logger.LogWarning($"Product with ID '{id}' not found.");
                 throw new ProductNotFoundException($"Product with ID {id} not found");
             }
+
             return product;
         }
 
         public async Task<IEnumerable<Product>> GetProductsByCategoryAndPriceRange(string category, decimal minPrice, decimal maxPrice)
         {
-            return await _context.Products.Where(p => p.Category == category && p.Price >= minPrice && p.Price <= maxPrice).ToListAsync();
+            var products = await _context.Products.Where(p => p.Category == category && p.Price >= minPrice && p.Price <= maxPrice).ToListAsync();
+            if (!products.Any()) 
+            {
+                _logger.LogWarning($"Products with Category '{category}' and Price range '{minPrice}-{maxPrice}' not found.");
+                throw new ProductNotFoundException($"Products with Category '{category}' and Price range '{minPrice}-{maxPrice}' not found.");
+            }
+
+            return products;
         }
 
         public async Task<IEnumerable<Product>> GetProductsByCategory(string category)
         {
-            return await _context.Products.Where(p => p.Category == category).ToListAsync();
+            var products = await _context.Products.Where(p => p.Category == category).ToListAsync();
+            if (!products.Any())
+            {
+                _logger.LogWarning($"Products with Category '{category}' not found.");
+                throw new ProductNotFoundException($"Products with Category '{category}' not found.");
+            }
+
+            return products;
         }
 
         public async Task<IEnumerable<Product>> GetProductsByPriceRange(decimal minPrice, decimal maxPrice)
         {
-            return await _context.Products.Where(p => p.Price >= minPrice && p.Price <= maxPrice).ToListAsync();
+            var products = await _context.Products.Where(p => p.Price >= minPrice && p.Price <= maxPrice).ToListAsync();
+            if (!products.Any())
+            {
+                _logger.LogWarning($"Products with Price range '{minPrice}-{maxPrice}' not found.");
+                throw new ProductNotFoundException($"Products with Price range '{minPrice}-{maxPrice}' not found.");
+            }
+            return products;
         }
 
         public async Task<IEnumerable<Product>> SearchProductsByName(string name)
         {
-            return await _context.Products.Where(p => p.Title.Contains(name)).ToListAsync();
+            var products = await _context.Products.Where(p => p.Title.Contains(name)).ToListAsync();
+            if (!products.Any())
+            {
+                _logger.LogWarning($"Products containing '{name}' in Title not found.");
+                throw new ProductNotFoundException($"Products containing '{name}' in Title not found.");
+            }
+
+            return products;
         }
     }
 }

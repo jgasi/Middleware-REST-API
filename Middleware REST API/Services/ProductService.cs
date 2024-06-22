@@ -1,4 +1,5 @@
-﻿using System.Reflection.Metadata.Ecma335;
+﻿using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
 using Azure;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Caching.Memory;
@@ -213,27 +214,149 @@ namespace Middleware_REST_API.Services
 
         public async Task<Product> GetProductById(int id)
         {
-            return await _productRepository.GetProductById(id);
+            string cacheKey = $"DbProduct-{id}";
+            if (!_cache.TryGetValue(cacheKey, out Product product))
+            {
+                product = await _productRepository.GetProductById(id);
+                _logger.LogInformation($"Cache miss for product with ID '{id}'. Fetching data from Local Database.");
+
+                if(product != null)
+                {
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(_cacheDuration);
+
+                    _cache.Set(cacheKey, product, cacheEntryOptions);
+                }
+            }
+            else
+            {
+                _logger.LogInformation($"Cache hit for product with ID '{id}'. Fetching data from Cache.");
+            }
+
+            return product;
         }
 
         public async Task<IEnumerable<Product>> GetProductsByCategoryAndPriceRange(string category, decimal minPrice, decimal maxPrice)
         {
-            return await _productRepository.GetProductsByCategoryAndPriceRange(category, minPrice, maxPrice);
+            string cacheKey = $"FilteredDbProducts-{category}-{minPrice}-{maxPrice}";
+            if (!_cache.TryGetValue(cacheKey, out IEnumerable<Product> products))
+            {
+                products = await _productRepository.GetProductsByCategoryAndPriceRange(category, minPrice, maxPrice);
+
+                if (products == null)
+                {
+                    throw new ProductNotFoundException($"No products found with Category '{category}' and price range '{minPrice}-{maxPrice}' from Local Database.");
+                }
+
+                _logger.LogInformation($"Cache miss for products with Category '{category}' and Price range '{minPrice}-{maxPrice}'. Fetching data from Local Database.");
+
+                if (products != null)
+                {
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(_cacheDuration);
+
+                    _cache.Set(cacheKey, products, cacheEntryOptions);
+                }
+            }
+            else
+            {
+                _logger.LogInformation($"Cache hit for products with Category '{category}' and Price range '{minPrice}-{maxPrice}'. Fetching data from Cache.");
+            }
+
+            return products;
         }
 
         public async Task<IEnumerable<Product>> GetProductsByCategory(string category)
         {
-            return await _productRepository.GetProductsByCategory(category);
+            string cacheKey = $"FilteredDbProducts-{category}";
+            if (!_cache.TryGetValue(cacheKey, out IEnumerable<Product> products))
+            {
+                products = await _productRepository.GetProductsByCategory(category);
+
+                if (products == null)
+                {
+                    throw new ProductNotFoundException($"No products found with Category '{category}' from Local Database.");
+                }
+
+                _logger.LogInformation($"Cache miss for products with Category '{category}'. Fetching data from Local Database.");
+
+                if (products != null)
+                {
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(_cacheDuration);
+
+                    _cache.Set(cacheKey, products, cacheEntryOptions);
+                }
+            }
+            else
+            {
+                _logger.LogInformation($"Cache hit for products with Category '{category}'. Fetching data from Cache.");
+            }
+
+            return products;
         }
 
         public async Task<IEnumerable<Product>> GetProductsByPriceRange(decimal minPrice, decimal maxPrice)
         {
-            return await _productRepository.GetProductsByPriceRange(minPrice, maxPrice);
+            string cacheKey = $"FilteredDbProducts-{minPrice}-{maxPrice}";
+            if (!_cache.TryGetValue(cacheKey, out IEnumerable<Product> products))
+            {
+                products = await _productRepository.GetProductsByPriceRange(minPrice, maxPrice);
+
+                if (products == null)
+                {
+                    throw new ProductNotFoundException($"No products found with Price range '{minPrice}-{maxPrice}' from Local Database.");
+                }
+
+                _logger.LogInformation($"Cache miss for products with Price range '{minPrice}-{maxPrice}'. Fetching data from Local Database.");
+
+                if (products != null)
+                {
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(_cacheDuration);
+
+                    _cache.Set(cacheKey, products, cacheEntryOptions);
+                }
+            }
+            else
+            {
+                _logger.LogInformation($"Cache hit for products with Price range '{minPrice}-{maxPrice}'. Fetching data from Cache.");
+            }
+
+
+
+            return products;
         }
 
         public async Task<IEnumerable<Product>> SearchProductsByName(string name)
         {
-            return await _productRepository.SearchProductsByName(name);
+            string cacheKey = $"FilteredDbProducts-{name}";
+            if (!_cache.TryGetValue(cacheKey, out IEnumerable<Product> products))
+            {
+                products = await _productRepository.SearchProductsByName(name);
+
+                if (products == null)
+                {
+                    throw new ProductNotFoundException($"No products found containing '{name}' in Title from Local Database.");
+                }
+
+                _logger.LogInformation($"Cache miss for products containing '{name}' in Title. Fetching data from Local Database.");
+
+                if (products != null)
+                {
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(_cacheDuration);
+
+                    _cache.Set(cacheKey, products, cacheEntryOptions);
+                }
+            }
+            else
+            {
+                _logger.LogInformation($"Cache hit for products containing '{name}' in Title. Fetching data from Cache.");
+            }
+
+
+            return products;
         }
     }
 }

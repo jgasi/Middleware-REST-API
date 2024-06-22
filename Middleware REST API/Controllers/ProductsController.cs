@@ -38,11 +38,17 @@ namespace Middleware_REST_API.Controllers
         }
 
         [HttpGet("api/{id}")]
-        public async Task<ActionResult<Product>> GetProductByIdFromExternalApi(int id)
+        public async Task<ActionResult<Product>> GetProductByIdFromExternalApi(string id)
         {
             try
             {
-                var product = await _productService.GetProductByIdFromExternalApi(id);
+                if (!int.TryParse(id, out int productId))
+                {
+                    _logger.LogWarning($"Invalid product ID format: '{id}'.");
+                    return BadRequest($"Invalid product ID format: '{id}'.");
+                }
+
+                var product = await _productService.GetProductByIdFromExternalApi(productId);
                 return Ok(product);
             }
             catch (ProductNotFoundException ex) 
@@ -53,11 +59,17 @@ namespace Middleware_REST_API.Controllers
         }
 
         [HttpGet("api/category/{category}/price")]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByCategoryAndPriceRangeFromExternalApi(string category, [FromQuery] decimal minPrice, [FromQuery] decimal maxPrice)
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByCategoryAndPriceRangeFromExternalApi(string category, [FromQuery] string minPrice, [FromQuery] string maxPrice)
         {
             try
             {
-                var products = await _productService.GetProductsByCategoryAndPriceRangeFromExternalApi(category, minPrice, maxPrice);
+                if (!decimal.TryParse(minPrice, out decimal productMinPrice) || !decimal.TryParse(maxPrice, out decimal productMaxPrice))
+                {
+                    _logger.LogWarning($"Invalid product Price range format: '{minPrice}-{maxPrice}'.");
+                    return BadRequest($"Invalid product Price range format: '{minPrice}-{maxPrice}'.");
+                }
+
+                var products = await _productService.GetProductsByCategoryAndPriceRangeFromExternalApi(category, productMinPrice, productMaxPrice);
                 return Ok(products);
             }
             catch (ProductNotFoundException ex) 
@@ -81,11 +93,17 @@ namespace Middleware_REST_API.Controllers
         }
 
         [HttpGet("api/price")]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByPriceRangeFromExternalApi([FromQuery] decimal minPrice, [FromQuery] decimal maxPrice)
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByPriceRangeFromExternalApi([FromQuery] string minPrice, [FromQuery] string maxPrice)
         {
             try
             {
-                var products = await _productService.GetProductsByPriceRangeFromExternalApi(minPrice, maxPrice);
+                if (!decimal.TryParse(minPrice, out decimal productMinPrice) || !decimal.TryParse(maxPrice, out decimal productMaxPrice))
+                {
+                    _logger.LogWarning($"Invalid product Price range format: '{minPrice}-{maxPrice}'.");
+                    return BadRequest($"Invalid product Price range format: '{minPrice}-{maxPrice}'.");
+                }
+
+                var products = await _productService.GetProductsByPriceRangeFromExternalApi(productMinPrice, productMaxPrice);
                 return Ok(products);
             }
             catch(ProductNotFoundException ex)
@@ -115,16 +133,29 @@ namespace Middleware_REST_API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
         {
-            var products = await _productService.GetAllProducts();
-            return Ok(products);
+            try
+            {
+                var products = await _productService.GetAllProducts();
+                return Ok(products);
+            }
+            catch (ProductNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProductById(int id)
+        public async Task<ActionResult<Product>> GetProductById(string id)
         {
             try
             {
-                var product = await _productService.GetProductById(id);
+                if (!int.TryParse(id, out int productId))
+                {
+                    _logger.LogWarning($"Invalid product ID format: '{id}'.");
+                    return BadRequest($"Invalid product ID format: '{id}'.");
+                }
+
+                var product = await _productService.GetProductById(productId);
                 return Ok(product);
             }
             catch (ProductNotFoundException ex) 
@@ -135,31 +166,71 @@ namespace Middleware_REST_API.Controllers
         }
 
         [HttpGet("category/{category}/price")]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByCategoryAndPriceRange(string category, [FromQuery] decimal minPrice, [FromQuery] decimal maxPrice)
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByCategoryAndPriceRange(string category, [FromQuery] string minPrice, [FromQuery] string maxPrice)
         {
-            var products = await _productService.GetProductsByCategoryAndPriceRange(category, minPrice, maxPrice);
-            return Ok(products);
+            try
+            {
+                if (!decimal.TryParse(minPrice, out decimal productMinPrice) || !decimal.TryParse(maxPrice, out decimal productMaxPrice))
+                {
+                    _logger.LogWarning($"Invalid product Price range format: '{minPrice}-{maxPrice}'.");
+                    return BadRequest($"Invalid product Price range format: '{minPrice}-{maxPrice}'.");
+                }
+
+                var products = await _productService.GetProductsByCategoryAndPriceRange(category, productMinPrice, productMaxPrice);
+                return Ok(products);
+            }
+            catch(ProductNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpGet("category/{category}")]
         public async Task<ActionResult<IEnumerable<Product>>> GetProductsByCategory(string category)
         {
-            var products = await _productService.GetProductsByCategory(category);
-            return Ok(products);
+            try
+            {
+                var products = await _productService.GetProductsByCategory(category);
+                return Ok(products);
+            }
+            catch (ProductNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpGet("price")]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByPriceRange([FromQuery] decimal minPrice, [FromQuery] decimal maxPrice)
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByPriceRange([FromQuery] string minPrice, [FromQuery] string maxPrice)
         {
-            var products = await _productService.GetProductsByPriceRange(minPrice, maxPrice);
-            return Ok(products);
+            try
+            {
+                if (!decimal.TryParse(minPrice, out decimal productMinPrice) || !decimal.TryParse(maxPrice, out decimal productMaxPrice))
+                {
+                    _logger.LogWarning($"Invalid product Price range format: '{minPrice}-{maxPrice}'.");
+                    return BadRequest($"Invalid product Price range format: '{minPrice}-{maxPrice}'.");
+                }
+
+                var products = await _productService.GetProductsByPriceRange(productMinPrice, productMaxPrice);
+                return Ok(products);
+            }
+            catch (ProductNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<Product>>> SearchProductsByName([FromQuery] string name)
         {
-            var products = await _productService.SearchProductsByName(name);
-            return Ok(products);
+            try
+            {
+                var products = await _productService.SearchProductsByName(name);
+                return Ok(products);
+            }
+            catch (ProductNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
     }
 }
