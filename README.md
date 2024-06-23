@@ -124,7 +124,7 @@ Authentication and authorization are enabled. You can test the application using
 
 ### Authorization
   - Determines the access rights and permissions of authenticated users.
-  - ASP.NET Core provides built-in support for validating JWT tokens through its authentication middleware. The functionality is provided by the **Microsoft.AspNetCore.Authentication.JwtBearer package**.
+  - ASP.NET Core provides built-in support for validating JWT tokens through its authentication middleware. The functionality is provided by the **Microsoft.AspNetCore.Authentication.JwtBearer** package.
   - If the token provided by the user is correct, the user is granted permission to the protected resources of the application.
 
 ### Exception handling
