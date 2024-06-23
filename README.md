@@ -1,6 +1,6 @@
 # Middleware REST API
 
-## Content
+## Table of Contents
 - [Introduction](#introduction)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
