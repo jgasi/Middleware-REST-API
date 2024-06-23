@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Middleware_REST_API.Model;
+using System.Collections.Generic;
 
 namespace Middleware_REST_API.Model
 {
@@ -6,6 +8,8 @@ namespace Middleware_REST_API.Model
     {
         public ContextDb(DbContextOptions<ContextDb> options) : base(options)
         {
+            // Ensure the database is created if it doesn't exist
+            Database.EnsureCreated();
         }
 
         public DbSet<Product> Products { get; set; }

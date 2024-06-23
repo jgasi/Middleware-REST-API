@@ -53,14 +53,14 @@ namespace Project_Tester.UnitTests
         public async Task GetProductByIdFromExternalApi_ExistingId_ReturnsProduct()
         {
             // Arrange
-            int existingProductId = 1;
+            int existingProductId = 1; string existingProductsId = "1";
             var expectedProduct = new Product { Id = existingProductId, Title = "Product 1", Price = 100, Description = "Description 1", Category = "electronics" };
 
             _mockProductService.Setup(service => service.GetProductByIdFromExternalApi(existingProductId))
                                .ReturnsAsync(expectedProduct);
 
             // Act
-            var result = await _controller.GetProductByIdFromExternalApi(existingProductId);
+            var result = await _controller.GetProductByIdFromExternalApi(existingProductsId);
 
             // Assert
             Assert.IsNotNull(result);
@@ -78,12 +78,12 @@ namespace Project_Tester.UnitTests
         public async Task GetProductByIdFromExternalApi_NonExistingId_ReturnsNotFound()
         {
             // Arrange
-            int nonExistingProductId = 999;
+            int nonExistingProductId = 999; string nonExistingProductsId = "999";
             _mockProductService.Setup(service => service.GetProductByIdFromExternalApi(nonExistingProductId))
                                .ThrowsAsync(new ProductNotFoundException($"Product with ID {nonExistingProductId} not found"));
 
             // Act
-            var result = await _controller.GetProductByIdFromExternalApi(nonExistingProductId);
+            var result = await _controller.GetProductByIdFromExternalApi(nonExistingProductsId);
 
             // Assert
             Assert.IsNotNull(result);
@@ -97,8 +97,8 @@ namespace Project_Tester.UnitTests
         {
             // Arrange
             string category = "electronics";
-            decimal minPrice = 50;
-            decimal maxPrice = 200;
+            decimal minPrice = 50; string minsPrice = "50";
+            decimal maxPrice = 200; string maxsPrcie = "200";
 
             var expectedProducts = new List<Product>
             {
@@ -111,7 +111,7 @@ namespace Project_Tester.UnitTests
                                .ReturnsAsync(expectedProducts.Where(p => p.Category == category));
 
             // Act
-            var result = await _controller.GetProductsByCategoryAndPriceRangeFromExternalApi(category, minPrice, maxPrice);
+            var result = await _controller.GetProductsByCategoryAndPriceRangeFromExternalApi(category, minsPrice, maxsPrcie);
 
             // Assert
             Assert.IsNotNull(result);
@@ -155,8 +155,8 @@ namespace Project_Tester.UnitTests
         public async Task GetProductsByPriceRangeFromExternalApi_ReturnsFilteredProducts()
         {
             // Arrange
-            decimal minPrice = 50;
-            decimal maxPrice = 200;
+            decimal minPrice = 50; string minsPrice = "50";
+            decimal maxPrice = 200; string maxsPrice = "200";
 
             var expectedProducts = new List<Product>
             {
@@ -170,7 +170,7 @@ namespace Project_Tester.UnitTests
                                .ReturnsAsync(expectedProducts.Where(p => p.Price >= minPrice && p.Price <= maxPrice));
 
             // Act
-            var result = await _controller.GetProductsByPriceRangeFromExternalApi(minPrice, maxPrice);
+            var result = await _controller.GetProductsByPriceRangeFromExternalApi(minsPrice, maxsPrice);
 
             // Assert
             Assert.IsNotNull(result);

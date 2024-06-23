@@ -209,7 +209,32 @@ namespace Middleware_REST_API.Services
 
         public async Task<IEnumerable<Product>> GetAllProducts()
         {
-            return await _productRepository.GetAllProducts();
+            string cacheKey = $"DbAllProducts";
+            if (!_cache.TryGetValue(cacheKey, out IEnumerable<Product> products))
+            {
+                products = await _productRepository.GetAllProducts();
+
+                if (products == null)
+                {
+                    throw new ProductNotFoundException($"No products found in Local Database.");
+                }
+
+                _logger.LogInformation($"Cache miss for all products. Fetching data from Local Database.");
+
+                if (products != null)
+                {
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(_cacheDuration);
+
+                    _cache.Set(cacheKey, products, cacheEntryOptions);
+                }
+            }
+            else
+            {
+                _logger.LogInformation($"Cache hit for all products. Fetching data from Cache.");
+            }
+
+            return products;
         }
 
         public async Task<Product> GetProductById(int id)
