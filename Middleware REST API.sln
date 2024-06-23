@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35004.147
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Middleware REST API", "Middleware REST API\Middleware REST API.csproj", "{C94B229C-BD22-4AFF-9DFE-871559D7565C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Middleware REST API", "Middleware REST API\Middleware REST API.csproj", "{C94B229C-BD22-4AFF-9DFE-871559D7565C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project Tester", "Project Tester\Project Tester.csproj", "{E5A7E4E7-EE92-48A3-81AB-22527F7CC2F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{C94B229C-BD22-4AFF-9DFE-871559D7565C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C94B229C-BD22-4AFF-9DFE-871559D7565C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C94B229C-BD22-4AFF-9DFE-871559D7565C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5A7E4E7-EE92-48A3-81AB-22527F7CC2F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5A7E4E7-EE92-48A3-81AB-22527F7CC2F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5A7E4E7-EE92-48A3-81AB-22527F7CC2F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5A7E4E7-EE92-48A3-81AB-22527F7CC2F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
